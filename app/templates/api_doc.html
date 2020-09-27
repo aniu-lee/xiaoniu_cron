@@ -1,0 +1,119 @@
+{% extends "admin_base.html" %}
+
+{% block css %}
+{% endblock %}
+{% block content %}
+    <div class="wrap">
+        <div class="jumbotron">
+            <div style="text-align: center">
+                <h1 class="display-4">小牛定时任务管理系统</h1>
+                <p class="lead">&nbsp;&nbsp;方便、统一、自由</p>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs">
+            <li><a href="{{ url_for('main.cron_list') }}">任务列表</a></li>
+            <li><a href="{{ url_for('main.cron_add') }}">任务添加</a></li>
+            <li><a href="{{ url_for('main.job_log_all_list') }}">任务执行记录</a></li>
+            <li class="active"><a href="{{ url_for('main.api_doc') }}">API文档</a></li>
+            <li><a href="{{ url_for('main.logout') }}">退出</a></li>
+        </ul>
+        <form method="post" class="form-horizontal js-ajax-form" action='{{ url_for('main.cron_add') }}'>
+            <fieldset>
+                <div class="control-group">
+                    <h3 id="urls"></h3>
+                    <h5>请求方式: GET,POST</h5>
+                    <h4>参数说明：</h4>
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                        <tr>
+                            <th>参数</th>
+                            <th>类型</th>
+                            <th>是否必传</th>
+                            <th>说明</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>task_name</td>
+                                <td>string</td>
+                                <td>是</td>
+                                <td>任务名称，如果存在则修改，不存在则添加。</td>
+                            </tr>
+                            <tr>
+                                <td>req_url</td>
+                                <td>string</td>
+                                <td>是</td>
+                                <td>回调请求地址</td>
+                            </tr>
+                            <tr>
+                                <td>task_keyword</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>备注</td>
+                            </tr>
+                            <tr>
+                                <td>run_date</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>执行时间，如果这个存在不为空，则任务模式就变成date模式</td>
+                            </tr>
+                            <tr>
+                                <td>day</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>天</td>
+                            </tr>
+                            <tr>
+                                <td>day_of_week</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>星期</td>
+                            </tr>
+                            <tr>
+                                <td>hour</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>小时</td>
+                            </tr>
+                            <tr>
+                                <td>minute</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>分钟</td>
+                            </tr>
+                            <tr>
+                                <td>second</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>秒</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </fieldset>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        var HOST_URL = function(){
+            var url = window.location.href;
+            var port = location.port;
+            var hostUrl = "http://";
+            if (url.indexOf("https")!==-1) {
+                hostUrl = "https://";
+            }
+            if(port === 80){
+                hostUrl += location.hostname;
+            }else{
+                hostUrl += location.host;
+            }
+            return hostUrl;
+        }();
+
+        $('#urls').html("请求链接： "+ HOST_URL +"/api/cron")
+    </script>
+{%  endblock %}
