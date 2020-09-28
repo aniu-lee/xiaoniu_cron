@@ -1,7 +1,5 @@
 # 小牛定时任务管理（xiaoniu_cron）
-> 定时任务统一管理。提供界面，api方便使用。
->当有报错，及时推送，方便修改。
->
+
 
 ### 特性
 
@@ -33,8 +31,8 @@
 #是否单机 0 集群 1单机模式
 is_single=1
 #如果 集群 redis配置必须配置
-redis_host=47.106.102.150
-redis_pwd=BUgaosuni666
+redis_host=127.0.0.1
+redis_pwd=123456
 redis_db=1
 redis_port=6379
 #【存储cron】存储cron定时数据 
@@ -75,18 +73,28 @@ sudo docker-compose up --build -d
 * 定时任务列表
 [![3](doc/3.png "添加date定时")]()
 
-### 问题反馈
+### 五、简单例子
+
+* 每个月20号提醒我还花呗
+
+* 每天凌晨2点清理垃圾
+
+。。。
+
+[更多例子设置参考](https://www.aniulee.com/#/details?id=260 "更多例子")
+
+### 六、问题反馈
 
 [问题反馈](https://support.qq.com/products/284784 "问题反馈")
 
-### 关于本人
+### 七、关于本人
 
 [aniulee博客](https://www.aniulee.com "aniulee博客")
 
 [两分钟内实现实时推送](https://www.aniulee.com/#/wx_push_setting "两分钟内实现实时推送")
 
 
-如果感觉项目还不错，有帮到您，给我来颗星，感谢！
+#### 如果感觉项目还不错，有帮到您，来颗星，感谢！
 
-开源不易，欢迎大佬赏杯茶。
+#### 开源不易，欢迎大佬赏杯茶。
 [![6](doc/6.png "添加date定时")]()
