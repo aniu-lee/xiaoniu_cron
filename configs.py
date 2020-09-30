@@ -17,6 +17,8 @@ def configs(key = None):
     redis_port = cp.get('default','redis_port')
     login_pwd = cp.get('default','login_pwd')
     error_notice_api_key = cp.get('default','error_notice_api_key')
+    job_log_counts = cp.get('default','job_log_counts')
+    api_access_token = cp.get('default','api_access_token')
 
     pz = {
         'is_single':is_single,
@@ -27,7 +29,9 @@ def configs(key = None):
         'cron_job_log_db_url':cron_job_log_db_url,
         'redis_port':redis_port,
         'lgoin_pwd':login_pwd,
-        'error_notice_url':error_notice_api_key
+        'error_notice_url':error_notice_api_key,
+        'job_log_counts':job_log_counts,
+        'api_access_token':api_access_token
     }
 
     return pz

@@ -25,6 +25,20 @@
 
 [体验地址](http://cron_demo.aniulee.com/ "体验地址")
 
+### 更新记录
+
+#### 2020-09-30
+
+祝大家国庆节快乐！！
+
+* 新增API-开启与关闭任务
+* 增加定时删除job记录，默认保留1000条记录(配置可修改)
+* API增加access_token,使API更健壮。(配置可修改)
+* 网页：增加记录删除功能
+* README更新
+大家有什么问题，或者更好的建议可以加群：730929995 交流交流！
+
+
 ### 一、基本配置(conf.ini 文件)
 ```ini
 [default]
@@ -49,6 +63,10 @@ login_pwd=12345679
 #推送api_key
 #https://www.aniulee.com/#/notices 实时推送
 error_notice_api_key=
+#每条job记录保存数
+job_log_counts = 1000
+#api调用的时候用到的，假如没设置，代表不验证
+api_access_token = abcdabcd
 ```
 
 ### 二、修改docker-compose.yml 文件
@@ -86,6 +104,8 @@ sudo docker-compose up --build -d
 ### 六、问题反馈
 
 [问题反馈](https://support.qq.com/products/284784 "问题反馈")
+
+QQ群：730929995
 
 ### 七、关于本人
 

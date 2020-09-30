@@ -4,6 +4,7 @@ from flask import request
 
 from app import scheduler, db
 from app.decorated import api_deal_return, api_err_return
+from configs import configs
 from datas.model.cron_infos import CronInfos
 from . import api
 from ..crons import cron_do
@@ -11,6 +12,7 @@ from ..crons import cron_do
 
 '''
 添加（更新）定时
+access_token
 task_name 任务名称唯一
 task_keyword 备注
 run_date 执行时间
@@ -26,11 +28,23 @@ req_url
 @api_deal_return
 def crons():
 
+    api_access_token = configs('api_access_token')
+
     datas = request.values.to_dict()
 
     task_name = datas.get('task_name')
 
     task_keyword = datas.get('task_keyword') or ''
+
+    access_token = datas.get('access_token')
+
+    if api_access_token:
+
+        if not access_token:
+            return api_err_return(msg='access_token不能为空')
+
+        if api_access_token != access_token:
+            return api_err_return(msg='access_token错误')
 
     if not task_name:
         return api_err_return(msg='任务名称不能为空')
@@ -131,6 +145,76 @@ def crons():
     scheduler.add_job("cron_%s" % cron_id, func=cron_do, args=[cron_id], replace_existing=True, **cron_datas)
 
     return 'ok'
+
+'''
+更新状态
+task_name 任务名称
+access_token 
+status
+'''
+@api.route('/cron/status',methods=['GET','POST'])
+@api_deal_return
+def cron_status():
+    datas = request.values.to_dict()
+
+    api_access_token = configs('api_access_token')
+
+    task_name = datas.get('task_name')
+
+    access_token = datas.get('access_token')
+
+    status = datas.get('status')
+
+    if status:
+        try:
+            if int(status) not in [0,1]:
+                return api_err_return(msg='status只能0或者1')
+        except:
+            return api_err_return(msg='status只能0或者1')
+
+    if api_access_token:
+
+        if not access_token:
+            return api_err_return(msg='access_token不能为空')
+
+        if api_access_token != access_token:
+            return api_err_return(msg='access_token错误')
+
+    if not task_name:
+        return api_err_return(msg='任务名称不能为空')
+
+    ci = CronInfos.query.filter(CronInfos.task_name == task_name).first()
+    if not ci:
+        return api_err_return(msg='任务不存在')
+
+    if ci.status == -1:
+        return api_err_return(msg='任务已结束，不能再操作，只能重新更新')
+
+    if not status:
+        #0停止1运行中
+        if ci.status == 0:
+            #开启
+            ci.status = 1
+            scheduler.resume_job('cron_%s' % ci.id)
+        else:
+            ci.status = 0
+            #关闭
+            scheduler.pause_job('cron_%s' % ci.id)
+    else:
+        if int(status) == 0 and ci.status != 0:
+            ci.status = 0
+            # 关闭
+            scheduler.pause_job('cron_%s' % ci.id)
+
+        if int(status) == 1 and ci.status !=1:
+            ci.status = 1
+            scheduler.resume_job('cron_%s' % ci.id)
+
+    db.session.add(ci)
+    db.session.commit()
+
+    return 'ok'
+
 
 
 

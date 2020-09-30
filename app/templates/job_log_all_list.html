@@ -32,6 +32,7 @@
                     <th>返回的内容</th>
                     <th>执行时间</th>
                     <th>耗时</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -42,6 +43,7 @@
                         <td>{{ item[0].content }}</td>
                         <td>{{ item[0].create_time }}</td>
                         <td>{{ item[0].take_time }}</td>
+                        <td><a href="{{ url_for('main.job_log_delete',job_log_id=item[0].id) }}" class="js-ajax-delete">删除</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>

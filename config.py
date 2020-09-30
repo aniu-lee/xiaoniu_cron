@@ -53,7 +53,8 @@ class Config:
             'replace_existing': True,
             'trigger': 'cron',
             'day_of_week': "*",
-            'day': '*/7',
+            'day': '*',
+            'hour':'*/8'
         }
     ]
 

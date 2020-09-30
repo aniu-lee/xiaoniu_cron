@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import requests
+from flask import jsonify
 
 from configs import configs
 
@@ -23,6 +24,13 @@ def wechat_info_err(titile,content=''):
             print(resp.json())
     except Exception as e:
         print(str(e))
+
+def web_api_return(code,msg='ok',url=''):
+    return jsonify({
+        'errcode': code,
+        'errmsg': msg,
+        'url': url
+    })
 
 def dict2string(dict_data,separator = "&&"):
     dd = separator.join("%s=%s" %(v,dict_data[v]) for v in dict_data)

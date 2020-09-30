@@ -13,6 +13,7 @@ from flask import current_app
 
 from app import scheduler, db
 from app.common.functions import wechat_info_err
+from configs import configs
 from datas.model.cron_infos import CronInfos
 from datas.model.job_log import JobLog
 from datas.utils.times import get_now_time, get_next_time
@@ -92,9 +93,24 @@ def cron_check():
 
     return
 
+'''
+保留一千条数据
+'''
 def cron_del_job_log():
     with scheduler.app.app_context():
-        today = get_next_time(format='%Y-%m-%d',days=-14)
-        sql = "delete from job_log where create_time < '%s 00:00'" % today
-        db.session.execute(sql)
-        db.session.commit()
+        # today = get_next_time(format='%Y-%m-%d',days=-14)
+        # sql = "delete from job_log where create_time < '%s 00:00'" % today
+        # db.session.execute(sql)
+        # db.session.commit()
+        try:
+            job_log_counts = configs('job_log_counts') or 0
+            if int(job_log_counts) !=0:
+                crons = CronInfos.query.all()
+                for item in crons:
+                    counts = JobLog.query.filter(JobLog.cron_info_id == item.id).count()
+                    if counts > int(job_log_counts):
+                        sql = "delete from job_log where cron_info_id = '%s' limit %s" % (item.id, (counts - int(job_log_counts)))
+                        db.session.execute(sql)
+                        db.session.commit()
+        except Exception as e:
+            print(str(e))

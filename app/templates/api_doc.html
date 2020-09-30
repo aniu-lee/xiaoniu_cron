@@ -35,6 +35,12 @@
                         </thead>
                         <tbody>
                             <tr>
+                                <td>access_token</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>conf.ini配置,如果没配置，证明不验证</td>
+                            </tr>
+                            <tr>
                                 <td>task_name</td>
                                 <td>string</td>
                                 <td>是</td>
@@ -91,7 +97,41 @@
                         </tbody>
                     </table>
                 </div>
-
+                <div class="control-group">
+                    <h3 id="urls2"></h3>
+                    <h5>请求方式: GET,POST</h5>
+                    <h4>参数说明：</h4>
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                        <tr>
+                            <th>参数</th>
+                            <th>类型</th>
+                            <th>是否必传</th>
+                            <th>说明</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>access_token</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>conf.ini配置,如果没配置，证明不验证</td>
+                            </tr>
+                            <tr>
+                                <td>task_name</td>
+                                <td>string</td>
+                                <td>是</td>
+                                <td>任务名称</td>
+                            </tr>
+                            <tr>
+                                <td>status</td>
+                                <td>int</td>
+                                <td>否</td>
+                                <td>操作。0关闭1开启，如果没传或者空，系统会自动判断更改状态。比如现在状态是开启则会关闭，反之！</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </fieldset>
         </form>
     </div>
@@ -114,6 +154,8 @@
             return hostUrl;
         }();
 
-        $('#urls').html("请求链接： "+ HOST_URL +"/api/cron")
+        $('#urls').html("添加/更新任务： "+ HOST_URL +"/api/cron")
+
+        $('#urls2').html("开启/暂停任务： "+ HOST_URL +"/api/cron/status")
     </script>
 {%  endblock %}
