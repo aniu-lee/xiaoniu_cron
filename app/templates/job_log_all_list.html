@@ -23,11 +23,16 @@
             <input type="text" name="beg_time" class="js-datetime" value="{{ keywords.get('beg_time') or '' }}" placeholder="开始时间"> -- <input type="text" name="end_time" class="js-datetime" value="{{ keywords.get('end_time') or '' }}" placeholder="结束时间">
             <input type="submit" class="btn btn-primary" value="搜索"/> <a href="{{ url_for('main.job_log_all_list') }}" class="btn btn-danger" >重置</a>
         </form>
-        <form method="post" class="js-ajax-form" action="">
+        <form method="post" class="js-ajax-form" action="{{ url_for('main.job_batch_delete') }}">
+            <div class="table-actions">
+                <button type="submit" class="btn btn-primary btn-small js-ajax-submit">批量删除</button>
+            </div>
             <table class="table table-hover table-bordered">
                 <thead>
                 <tr>
-                    <th>编号</th>
+                    <th width="15"><label><input type="checkbox" class="js-check-all" data-direction="x"
+                                                 data-checklist="js-check-x"></label></th>
+                    <th>ID</th>
                     <th>任务名称</th>
                     <th>返回的内容</th>
                     <th>执行时间</th>
@@ -38,6 +43,7 @@
                 <tbody>
                     {% for item in page_data.items %}
                     <tr>
+                        <td><input class="js-check" data-yid="js-check-y" data-xid="js-check-x" type="checkbox" name="id" value="{{ item[0].id }}"></td>
                         <td>{{ item[0].id }}</td>
                         <td>{{ item[1].task_name }}</td>
                         <td>{{ item[0].content }}</td>

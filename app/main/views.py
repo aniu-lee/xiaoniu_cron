@@ -92,6 +92,14 @@ def job_log_delete():
 
     return web_api_return(code=0,msg='删除成功')
 
+@main.route('/job_batch_delete', methods=['GET', 'POST'])
+@login_required
+def job_batch_delete():
+    ids = request.form.getlist('id')
+    JobLog.query.filter(JobLog.id.in_(ids)).delete(synchronize_session=False)
+    db.session.commit()
+    return web_api_return(code=0, msg='操作成功', url='/job_log_all_list')
+
 @main.route('/cron_add', methods=['GET', 'POST'])
 @login_required
 def cron_add():
@@ -359,6 +367,22 @@ def cron_del():
     db.session.execute("delete from job_log where cron_info_id='%s'" % cron_id)
 
     db.session.commit()
+    return web_api_return(code=0, msg='操作成功', url='/cron_list')
+
+@main.route('/cron_batch_del', methods=['GET', 'POST'])
+@login_required
+def cron_batch_del():
+    ids = request.form.getlist('id')
+    CronInfos.query.filter(CronInfos.id.in_(ids)).delete(synchronize_session=False)
+    JobLog.query.filter(JobLog.cron_info_id.in_(ids)).delete(synchronize_session=False)
+    db.session.commit()
+
+    try:
+        for cron_id in ids:
+            scheduler.remove_job('cron_%s' % cron_id)
+    except:
+        pass
+
     return web_api_return(code=0, msg='操作成功', url='/cron_list')
 
 @main.route('/check_pass', methods=['GET', 'POST'])

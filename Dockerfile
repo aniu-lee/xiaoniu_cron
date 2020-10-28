@@ -2,8 +2,6 @@ FROM ubuntu:16.04
 MAINTAINER aniulee@qq.com
 RUN mkdir /home/www
 COPY docker_start.sh /home/www
-RUN mkdir /root/.pip
-COPY pip.conf /root/.pip
 RUN apt-get update && apt-get install -y tzdata python3.5 python-pip python3-pip libmysqlclient-dev python3-dev
 RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN echo "Asia/Shanghai" > /etc/timezone

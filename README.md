@@ -25,7 +25,20 @@
 
 [体验地址](http://cron_demo.aniulee.com/ "体验地址")
 
+大家有什么问题，或者更好的建议可以加群：730929995 交流交流！
+
 ### 更新记录
+
+#### 2020-10-28
+
+* 新增回调返回错误关键词自定义(配置可修改)
+* 新增WEB管理任务，任务记录批量删除
+* 优化定时任务异常报错，增加异常捕获
+* docker配置修改，使其更精简
+
+新增开源项目（欢迎star）
+
+[小牛异步队列任务系统](https://github.com/aniu-lee/xiaoniu_tasks "小牛异步队列任务系统")
 
 #### 2020-09-30
 
@@ -36,7 +49,6 @@
 * API增加access_token,使API更健壮。(配置可修改)
 * 网页：增加记录删除功能
 * README更新
-大家有什么问题，或者更好的建议可以加群：730929995 交流交流！
 
 
 ### 一、基本配置(conf.ini 文件)
@@ -63,6 +75,8 @@ login_pwd=12345679
 #推送api_key
 #https://www.aniulee.com/#/notices 实时推送
 error_notice_api_key=
+#异常返回关键词，可自定义,不区分大小写(多个请用，隔开)。当请求req_url之后返回如果包含此关键词，则就会报错通知
+error_keyword=fail
 #每条job记录保存数
 job_log_counts = 1000
 #api调用的时候用到的，假如没设置，代表不验证
@@ -72,23 +86,34 @@ api_access_token = abcdabcd
 ### 二、修改docker-compose.yml 文件
 1. 项目地址
 2. 端口号
+
 [![5](doc/5.png "修改docker-compose.yml文件")]()
+
 ### 三、docker 一键安装
+
 ```shell script
 sudo docker-compose up --build -d
 ```
+
 具体docker,docker-compose怎么安装，自行谷歌，百度。
 
 ### 四、开始使用
+
 > 访问链接 http://{ip}:{docker-compose.yml设置的端口}
 
 
 * 添加定时任务
+
 [![1](doc/1.png "添加date定时")]()
+
 [![2](doc/2.png "添加定时")]()
+
 * 通过api调用 
+
 [![4](doc/4.png "添加定时")]()
+
 * 定时任务列表
+
 [![3](doc/3.png "添加date定时")]()
 
 ### 五、简单例子
@@ -110,6 +135,8 @@ QQ群：730929995
 ### 七、关于本人
 
 [aniulee博客](https://www.aniulee.com "aniulee博客")
+
+[小牛异步队列任务系统](https://github.com/aniu-lee/xiaoniu_tasks "小牛异步队列任务系统")
 
 [两分钟内实现实时推送](https://www.aniulee.com/#/wx_push_setting "两分钟内实现实时推送")
 

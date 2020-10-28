@@ -4,7 +4,7 @@ services:
   cron_docker:
     build: "./"
     volumes:
-      - /var/www/xiaoniu_cron:/home/www
+      - /home/www/xiaoniu_cron:/home/www
     ports:
       - "5002:80"
     command: "/home/www/docker_start.sh"
