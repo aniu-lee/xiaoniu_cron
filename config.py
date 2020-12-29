@@ -18,6 +18,8 @@ class Config:
 
     CRON_DB_URL = configs('cron_db_url')
 
+    BASEDIR = basedir
+
     SCHEDULER_JOBSTORES = {
         'default': SQLAlchemyJobStore(url=configs('cron_db_url'))
     }
@@ -62,10 +64,12 @@ class Config:
 
     @staticmethod
     def init_app(app):
-        pass
+        logs_path = os.path.join(basedir, 'datas/logs')
+        if not os.path.exists(logs_path):
+            os.mkdir(logs_path)
 
 class DevelopmentConfig(Config):
-    DEBUG = False
+    DEBUG = True
 
     SQLALCHEMY_DATABASE_URI = configs('cron_job_log_db_url')
 
@@ -77,6 +81,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+    SQLALCHEMY_DATABASE_URI = configs('cron_job_log_db_url')
 
 config = {
     'development': DevelopmentConfig,

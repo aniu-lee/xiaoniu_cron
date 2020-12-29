@@ -4,8 +4,11 @@ services:
   cron_docker:
     build: "./"
     volumes:
-      - /home/www/xiaoniu_cron:/home/www
+      - /home/aniulee/datas/python_space/github/xiaoniu_cron:/home/www
     ports:
       - "5002:80"
-    command: "/home/www/docker_start.sh"
+    command: "/usr/bin/supervisord"
+    environment:
+      PYTHONIOENCODING: "utf-8"
+      FLASK_CONFIG: "production"
     restart: always

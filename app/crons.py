@@ -2,12 +2,10 @@
 # -*- coding:utf-8 -*-
 import datetime
 import json
-import random
 import time
-import uuid
+import traceback
 
 import records
-import redis
 import requests
 from flask import current_app
 
@@ -16,14 +14,15 @@ from app.common.functions import wechat_info_err
 from configs import configs
 from datas.model.cron_infos import CronInfos
 from datas.model.job_log import JobLog
-from datas.utils.times import get_now_time, get_next_time
+from datas.utils.times import get_now_time
 
 '''
 定时操作
 '''
 def cron_do(cron_id):
-    try:
-        with scheduler.app.app_context():
+    with scheduler.app.app_context():
+
+        try:
             nows = get_now_time()
 
             cif = CronInfos.query.get(cron_id)
@@ -78,46 +77,54 @@ def cron_do(cron_id):
 
                             wechat_info_err('定时任务【%s】发生严重错误' % cif.task_name, '返回信息:%s' % str(e))
 
-    except Exception as e:
-        wechat_info_err('定时任务发生严重错误', '返回信息:%s' % str(e))
+        except Exception as e:
+            trace_info = traceback.format_exc()
+            current_app.logger.error("==============")
+            current_app.logger.error(str(e))
+            current_app.logger.error(trace_info)
+            current_app.logger.error("==============")
+            wechat_info_err('定时任务发生严重错误', '返回信息:%s' % str(e))
 
-    return ""
+    return "ok"
 
 def cron_check():
     with scheduler.app.app_context():
-        def dbs():
-            url = current_app.config.get('CRON_DB_URL')
-            db = records.Database(url)
-            db = db.get_connection()  # 新加
-            return db
+        try:
+            def dbs():
+                url = current_app.config.get('CRON_DB_URL')
+                db = records.Database(url)
+                db = db.get_connection()  # 新加
+                return db
 
-        job_db = dbs()
-        job_arr = []
-        jobs = job_db.query("select id from apscheduler_jobs").all()
-        if jobs:
-            for item in jobs:
-                job_arr.append(item.id)
+            job_db = dbs()
+            job_arr = []
+            jobs = job_db.query("select id from apscheduler_jobs").all()
+            if jobs:
+                for item in jobs:
+                    job_arr.append(item.id)
 
-        cifs = CronInfos.query.all()
+            cifs = CronInfos.query.all()
 
-        if cifs:
-            for item in cifs:
-                if "cron_%s" % item.id not in job_arr:
-                    item.status = -1
-                    db.session.add(item)
-                    db.session.commit()
-
-    return
+            if cifs:
+                for item in cifs:
+                    if "cron_%s" % item.id not in job_arr:
+                        item.status = -1
+                        db.session.add(item)
+                        db.session.commit()
+        except Exception as e:
+            trace_info = traceback.format_exc()
+            current_app.logger.error("==============")
+            current_app.logger.error(str(e))
+            current_app.logger.error(trace_info)
+            current_app.logger.error("==============")
+            wechat_info_err('定时任务发生严重错误', '返回信息:%s' % str(e))
+    return "ok"
 
 '''
 保留一千条数据
 '''
 def cron_del_job_log():
     with scheduler.app.app_context():
-        # today = get_next_time(format='%Y-%m-%d',days=-14)
-        # sql = "delete from job_log where create_time < '%s 00:00'" % today
-        # db.session.execute(sql)
-        # db.session.commit()
         try:
             job_log_counts = configs('job_log_counts') or 0
             if int(job_log_counts) !=0:
@@ -129,4 +136,9 @@ def cron_del_job_log():
                         db.session.execute(sql)
                         db.session.commit()
         except Exception as e:
-            print(str(e))
+            trace_info = traceback.format_exc()
+            current_app.logger.error("==============")
+            current_app.logger.error(str(e))
+            current_app.logger.error(trace_info)
+            current_app.logger.error("==============")
+    return "ok"

@@ -29,6 +29,14 @@
 
 ### 更新记录
 
+#### 2020-12-30
+
+提前祝大家新年快乐，元旦快乐！！
+
+* Python环境由原来3.5调整为3.6。
+* 服务用supervisor来维护。
+* 增加日志系统，存放于datas/logs目录下。
+
 #### 2020-10-28
 
 * 新增回调返回错误关键词自定义(配置可修改)
@@ -96,6 +104,8 @@ sudo docker-compose up --build -d
 ```
 
 具体docker,docker-compose怎么安装，自行谷歌，百度。
+
+https://www.aniulee.com/#/details?id=286
 
 ### 四、开始使用
 

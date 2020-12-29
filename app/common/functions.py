@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import requests
-from flask import jsonify
+from flask import jsonify, current_app
 
 from configs import configs
 
@@ -23,7 +23,7 @@ def wechat_info_err(titile,content=''):
             resp = requests.post(post_url, data=data,timeout=2,headers={'user-agent':'XNCron'})
             print(resp.json())
     except Exception as e:
-        print(str(e))
+        current_app.logger.error("推送有BUG【%s】" % str(e))
 
 def web_api_return(code,msg='ok',url=''):
     return jsonify({
