@@ -37,6 +37,7 @@
                     <th>返回的内容</th>
                     <th>执行时间</th>
                     <th>耗时</th>
+                    <th>更详细的执行记录</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -49,6 +50,8 @@
                         <td>{{ item[0].content }}</td>
                         <td>{{ item[0].create_time }}</td>
                         <td>{{ item[0].take_time }}</td>
+                        <td><a href="javascript:;" onclick="open_iframe_dialog('{{ url_for('main.job_log_item_list',log_id=item.log_id) }}','详细执行记录',{width: '80%',
+        height: '80%'})">查看</a></td>
                         <td><a href="{{ url_for('main.job_log_delete',job_log_id=item[0].id) }}" class="js-ajax-delete">删除</a></td>
                     </tr>
                 {% endfor %}

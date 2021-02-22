@@ -4,6 +4,7 @@ import traceback
 from app import scheduler, db
 from datas.model.cron_infos import CronInfos
 from datas.model.job_log import JobLog
+from datas.model.job_log_items import JobLogItems
 from datas.utils.times import get_now_time
 from . import main
 from flask import render_template, request, redirect, session, current_app, jsonify, url_for
@@ -49,6 +50,14 @@ def job_log_list():
         del keywords['page']
 
     return render_template("job_log_list.html", page_data=page_data, keywords=keywords)
+
+@main.route('/job_log_item_list', methods=['GET', 'POST'])
+@login_required
+def job_log_item_list():
+    log_id = request.args.get('log_id')
+    page_data = JobLogItems.query.filter(JobLogItems.log_id == log_id).all()
+
+    return render_template("job_log_item_list.html", page_data=page_data)
 
 @main.route('/job_log_all_list', methods=['GET', 'POST'])
 @login_required

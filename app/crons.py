@@ -4,21 +4,29 @@ import datetime
 import json
 import time
 import traceback
+import uuid
 
 import records
 import requests
 from flask import current_app
 
 from app import scheduler, db
-from app.common.functions import wechat_info_err
+from app.common.functions import wechat_info_err, single_task
 from configs import configs
 from datas.model.cron_infos import CronInfos
 from datas.model.job_log import JobLog
 from datas.utils.times import get_now_time
 
+
+@single_task()
+def cron_check_db_sleep():
+    with scheduler.app.app_context():
+        db.session.execute("select 1 limit 1").first()
+
 '''
 定时操作
 '''
+@single_task()
 def cron_do(cron_id):
     with scheduler.app.app_context():
 
@@ -44,9 +52,12 @@ def cron_do(cron_id):
                         db.session.commit()
                     else:
                         try:
+
+                            xiaoniu_cron_log_id = str(uuid.uuid1())
+
                             t = time.time()
 
-                            req = requests.get(req_url,timeout=2*60,headers={'user-agent':'xmb_cron'})
+                            req = requests.get(req_url,params={'xiaoniu_cron_log_id':xiaoniu_cron_log_id},timeout=2*60,headers={'user-agent':'xiaoniu_cron'})
 
                             ret = req.text
 
@@ -67,7 +78,7 @@ def cron_do(cron_id):
                                         wechat_info_err('定时任务【%s】发生错误' % cif.task_name, '返回信息:%s' % ret)
                                         break
 
-                            jl = JobLog(cron_info_id=cron_id, content=ret, create_time=nows,take_time=time.time() - t)
+                            jl = JobLog(cron_info_id=cron_id, content=ret, create_time=nows,take_time=time.time() - t,log_id=xiaoniu_cron_log_id)
                             db.session.add(jl)
                             db.session.commit()
                         except Exception as e:
@@ -87,6 +98,7 @@ def cron_do(cron_id):
 
     return "ok"
 
+@single_task()
 def cron_check():
     with scheduler.app.app_context():
         try:
@@ -123,6 +135,7 @@ def cron_check():
 '''
 保留一千条数据
 '''
+@single_task()
 def cron_del_job_log():
     with scheduler.app.app_context():
         try:

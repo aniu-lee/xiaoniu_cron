@@ -25,9 +25,19 @@
 
 [体验地址](http://cron_demo.aniulee.com/ "体验地址")
 
-大家有什么问题，或者更好的建议可以加群：730929995 交流交流！
+大家有什么问题，或者更好的建议可以加群：[730929995](https://jq.qq.com/?_wv=1027&k=6ovCipI9) 交流交流！
+或者 [问题反馈](https://support.qq.com/products/284784 "问题反馈")
 
 ### 更新记录
+
+#### 2021-02-22
+
+提前祝大家元宵节快乐！！
+
+* 优化分布式，如果有人需要用分布式的话，最好用此版本。
+* 增加`上传实时执行记录`，方便用户查看该任务更详细情况。比如定时任务调用的是一个长时间的操作（通常会加异步去处理），这时候就需要上传任务更详细的执行的情况。
+* 页面优化。
+* 增加数据库更新命令
 
 #### 2020-12-30
 
@@ -72,11 +82,11 @@ redis_port=6379
 #【存储cron】存储cron定时数据 
 #如果是集群模式 数据库得选mysql
 #如果是docker 安装 默认 sqlite:////home/www/xiaoniu_cron.sqlite
-#'mysql+pymysql://用户:密码@数据库ip/xiaoniu_cron'
+#mysql url 格式： mysql+pymysql://用户:密码@数据库ip/xiaoniu_cron
 cron_db_url=sqlite:////home/www/xiaoniu_cron.sqlite
 #存储job_log 如果是集群模式 数据库得选mysql 
 #如果是docker 安装 默认 sqlite:////home/www/xiaoniu_db.sqlite
-#mysql url 格式：mysql+pymysql://{用户}:{密码}@{数据库ip}/xiaoniu_db
+#mysql url 格式：mysql+pymysql://{用户}:{密码}@{数据库ip}/xiaoniu_cron
 cron_job_log_db_url=sqlite:////home/www/xiaoniu_db.sqlite
 #网页登录密码
 login_pwd=12345679
@@ -111,6 +121,9 @@ https://www.aniulee.com/#/details?id=286
 
 > 访问链接 http://{ip}:{docker-compose.yml设置的端口}
 
+### 五、更新数据库命令
+
+`sudo docker exec -it {容器ID} /bin/bash -c 'cd /home/www && python3.6 manage.py db migrate -m "upgrade" && python3.6 manage.py db upgrade'` 
 
 * 添加定时任务
 
@@ -140,7 +153,7 @@ https://www.aniulee.com/#/details?id=286
 
 [问题反馈](https://support.qq.com/products/284784 "问题反馈")
 
-QQ群：730929995
+QQ群：[730929995](https://jq.qq.com/?_wv=1027&k=6ovCipI9)
 
 ### 七、关于本人
 

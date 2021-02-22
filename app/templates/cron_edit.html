@@ -80,7 +80,7 @@
                     <label class="control-label">回调URL以及参数</label>
                     <div class="controls">
                         <input type="text" name="req_url" value="{{ cif.req_url }}">
-                        统一GET请求;当返回内容包含自定义错误关键词里面就会推送错误;配置里面自行配置。
+                        统一GET请求;当返回内容包含自定义错误关键词里面就会推送错误;配置里面自行配置;系统默认会拼上参数xiaoniu_cron_log_id一起传过去。
                     </div>
                 </div>
                 <input type="hidden" name="id" value="{{ cif.id }}">

@@ -132,6 +132,41 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="control-group">
+                    <h3 id="urls3"></h3>
+                    <h5>请求方式: GET,POST</h5>
+                    <h4>参数说明：</h4>
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                        <tr>
+                            <th>参数</th>
+                            <th>类型</th>
+                            <th>是否必传</th>
+                            <th>说明</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>access_token</td>
+                                <td>string</td>
+                                <td>否</td>
+                                <td>conf.ini配置,如果没配置，证明不验证</td>
+                            </tr>
+                            <tr>
+                                <td>xiaoniu_cron_log_id</td>
+                                <td>string</td>
+                                <td>是</td>
+                                <td>这个参数会在系统请求您自定义的回调URL的时候，一起传过去。</td>
+                            </tr>
+                            <tr>
+                                <td>content</td>
+                                <td>string</td>
+                                <td>是</td>
+                                <td>内容</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </fieldset>
         </form>
     </div>
@@ -154,8 +189,10 @@
             return hostUrl;
         }();
 
-        $('#urls').html("添加/更新任务： "+ HOST_URL +"/api/cron")
+        $('#urls').html("1、添加/更新任务： "+ HOST_URL +"/api/cron")
 
-        $('#urls2').html("开启/暂停任务： "+ HOST_URL +"/api/cron/status")
+        $('#urls2').html("2、开启/暂停任务： "+ HOST_URL +"/api/cron/status")
+
+        $('#urls3').html("3、上传实时执行记录: " + HOST_URL + "/api/cron/add_log")
     </script>
 {%  endblock %}

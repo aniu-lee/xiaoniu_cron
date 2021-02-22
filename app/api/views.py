@@ -6,6 +6,8 @@ from app import scheduler, db
 from app.decorated import api_deal_return, api_err_return
 from configs import configs
 from datas.model.cron_infos import CronInfos
+from datas.model.job_log import JobLog
+from datas.model.job_log_items import JobLogItems
 from . import api
 from ..crons import cron_do
 
@@ -215,7 +217,44 @@ def cron_status():
 
     return 'ok'
 
+'''
+上传执行记录
+xiaoniu_cron_log_id
+content
+'''
+@api.route('/cron/add_log',methods=['GET','POST'])
+@api_deal_return
+def cron_add_log():
+    datas = request.values.to_dict()
 
+    api_access_token = configs('api_access_token')
+
+    access_token = datas.get('access_token')
+
+    xiaoniu_cron_log_id = datas.get('xiaoniu_cron_log_id')
+
+    if api_access_token:
+
+        if not access_token:
+            return api_err_return(msg='access_token不能为空')
+
+        if api_access_token != access_token:
+            return api_err_return(msg='access_token错误')
+
+    if not xiaoniu_cron_log_id:
+        return api_err_return(msg='xiaoniu_cron_log_id 必传哦！')
+
+    content = datas.get('content')
+    if not content:
+        return api_err_return(msg='日志内容不能为空')
+
+    jl = JobLog.query.filter(JobLog.log_id == xiaoniu_cron_log_id).first()
+    if not jl:
+        return api_err_return(msg='xiaoniu_cron_log_id 不存在')
+    jli = JobLogItems(log_id=xiaoniu_cron_log_id,content=content)
+    db.session.add(jli)
+    db.session.commit()
+    return 'ok'
 
 
 

@@ -22,6 +22,7 @@
         <form class="well form-search" method="get" action="{{ url_for('main.cron_list') }}">高级查询：
             <input type="text" placeholder="任务名称" name="task_name" value="{{ keyword.get("task_name","") }}">
             <input type="submit" class="btn btn-primary" value="搜索"/>
+            <a href="{{ url_for('main.cron_list') }}" class="btn btn-danger" >重置</a>
         </form>
         <form method="post" class="js-ajax-form" action="{{ url_for('main.cron_batch_del') }}">
             <div class="table-actions">
@@ -34,7 +35,7 @@
                                                  data-checklist="js-check-x"></label></th>
                     <th>ID</th>
                     <th>任务名称</th>
-                    <th>关键词</th>
+                    <th>备注</th>
                     <th>具体时间</th>
                     <th>星期</th>
                     <th>日</th>

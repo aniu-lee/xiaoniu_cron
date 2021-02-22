@@ -33,7 +33,7 @@ class Config:
     SCHEDULER_JOB_DEFAULTS = {
         'coalesce': False,
         'max_instances': 20,
-        'misfire_grace_time': 50#30秒内允许过期
+        'misfire_grace_time': 50
     }
 
     JOBS = [
@@ -57,6 +57,17 @@ class Config:
             'day_of_week': "*",
             'day': '*',
             'hour':'*/8'
+        },
+        {
+            'id': 'cron_check_db_sleep',
+            'func': 'app.crons:cron_check_db_sleep',
+            'args': None,
+            'replace_existing': True,
+            'trigger': 'cron',
+            'day_of_week': "*",
+            'day': '*',
+            'hour': '*',
+            'minute': '*/10',
         }
     ]
 

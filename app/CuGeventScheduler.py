@@ -2,12 +2,10 @@
 # -*- coding:utf-8 -*-
 import fcntl
 import os
-import uuid
 from datetime import datetime, timedelta
 from threading import TIMEOUT_MAX
 
 import records
-import redis
 import six
 from apscheduler.events import JobSubmissionEvent, EVENT_JOB_MAX_INSTANCES, EVENT_JOB_SUBMITTED
 from apscheduler.executors.base import MaxInstancesReachedError
@@ -57,31 +55,6 @@ class CuGeventScheduler(GeventScheduler):
             now = datetime.now(self.timezone)
             next_wakeup_time = None
             events = []
-
-            uuids = str(uuid.uuid1())
-
-            config = configs()
-
-            is_single = config.get('is_single')
-
-            if is_single and is_single != '1':
-                if config.get('redis_pwd'):
-                    pool = redis.ConnectionPool(host=config.get('redis_host'), port=config.get('redis_port') or 6379,
-                                                db=config.get('redis_db') or 0, password=config.get('redis_pwd'))
-                else:
-                    pool = redis.ConnectionPool(host=config.get('redis_host'), port=config.get('redis_port') or 6379,
-                                                db=config.get('redis_db') or 0)
-
-                r = redis.Redis(connection_pool=pool)
-
-                _result = r.get("SCHEDU_FLAG")
-
-                if _result:
-                    if _result.decode() == uuids[0:2]:
-                        return
-
-                r.setnx("SCHEDU_FLAG", uuids[0:2])
-                r.expire("SCHEDU_FLAG", 60 * 10)
 
             with self._jobstores_lock:
                 for jobstore_alias, jobstore in six.iteritems(self._jobstores):
@@ -164,9 +137,6 @@ class CuGeventScheduler(GeventScheduler):
                 wait_seconds = min(max(timedelta_seconds(next_wakeup_time - now), 0), TIMEOUT_MAX)
                 self._logger.debug('Next wakeup is due at %s (in %f seconds)', next_wakeup_time,
                                    wait_seconds)
-
-            if is_single and is_single != '1':
-                r.delete("SCHEDU_FLAG")
 
             fcntl.flock(f, fcntl.LOCK_UN)
             f.close()

@@ -25,17 +25,22 @@
     </style>
 </head>
 <body>
+<div class="jumbotron" style="background-color: white;">
+            <div style="text-align: center">
+                <h1 class="display-4">小牛定时任务管理系统</h1>
+                <p class="lead">&nbsp;&nbsp;方便、统一、自由</p>
+            </div>
+        </div>
 <div style="text-align: center">
-{% if msg %}
-<div class="alert alert-danger alert-dismissible" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <strong>Warning!</strong> {{ msg }}
-    </div>
-{% endif %}
 <form action="{{ url_for('main.check_pass') }}" method="post" class="well form-search form-inline">
-    <input type="text" name="password" value="" placeholder="密码" class="form-control"> <input type="submit" value="提交" class="btn btn-primary">
+    <input type="text" name="password" value="" placeholder="密码" class="form-control"> <input type="submit" value="确定" class="btn btn-primary">
     <br>当前系统时间: {{ today }}
 </form>
+    {% if msg %}
+<div style="text-align: center;font-size: 1.2em;color: red">
+       {{ msg }}
+    </div>
+{% endif %}
 </div>
 </body>
 </html>

@@ -22,7 +22,8 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.ERROR)
+
     formatter = logging.Formatter(
         "[%(asctime)s][%(filename)s:%(lineno)d][%(levelname)s][%(thread)d] - %(message)s")
 
