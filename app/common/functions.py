@@ -1,5 +1,9 @@
 #!/usr/bin/python3 
 # -*- coding:utf-8 -*-
+import hashlib
+import json
+import os
+import time
 from functools import wraps
 
 import redis
@@ -7,23 +11,28 @@ import requests
 from flask import jsonify, current_app
 
 from configs import configs
+from datas.utils.times import get_now_time
+
+'''
+md5加密
+'''
+def md5(str=''):
+    m = hashlib.md5()
+    m.update(str.encode('utf8'))
+    return m.hexdigest()
+
+def get_xiaoniu_cron_sign(data={},api_key=''):
+    key_data=[d for d in sorted(data,reverse=False)]
+    values = '&&'.join("%s=%s" %(v,data[v]) for v in key_data if data[v])+"&&api_key=" + api_key
+    return md5(values)
 
 '''
 推送
-https://www.aniulee.com
 '''
 def wechat_info_err(titile,content=''):
     try:
-        api_key = configs('error_notice_api_key')
-        if api_key:
-            post_url = 'https://api.aniulee.com/blog_api_go/api/v1/push'
-            data = {
-                'api_key': api_key,
-                'content': content,
-                'title': titile
-            }
-            resp = requests.post(post_url, data=data,timeout=2,headers={'user-agent':'XNCron'})
-            print(resp.json())
+        content = '【小牛定时任务推送】\n{}\n{}\n{}'.format(get_now_time(),titile,content)
+        send_text(content=content)
     except Exception as e:
         current_app.logger.error("推送有BUG【%s】" % str(e))
 
@@ -38,6 +47,81 @@ def dict2string(dict_data,separator = "&&"):
     dd = separator.join("%s=%s" %(v,dict_data[v]) for v in dict_data)
     return dd
 
+'''
+缓存
+key
+value 值
+timeout 过期时间
+'''
+def caches(key,value=None,timeout=-1):
+    BASEDIR = current_app.config.get('BASEDIR')
+    if not os.path.isdir(os.path.join(BASEDIR,'caches')):
+        os.mkdir(os.path.join(BASEDIR,'caches'))
+
+    files = os.path.join(BASEDIR,"caches/%s.log" % key)
+
+    if value is None and key:
+        if not os.path.isfile(files):
+            return None
+        with open(files,'r') as f:
+            data = json.loads(f.read())
+            _timeout = data.get('timeout')
+            if int(_timeout) == -1:
+                return data.get('value')
+            #过期
+            if int(_timeout) < int(time.time()):
+                os.remove(files)
+                return None
+            return data.get('value')
+
+    if key and value:
+        with open(files, mode="w", encoding="utf-8") as fd:
+            if timeout < int(time.time()) and timeout > 0:
+                timeout = int(time.time()) + timeout
+            value = json.dumps({
+                'value': value,
+                'timeout':timeout
+            },ensure_ascii=False)
+            fd.write(value)
+
+    return 'ok'
+
+def get_access_token(corpid,corpsecret):
+    cache_access_token = caches('qywechat_access_token')
+    if not cache_access_token:
+        url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s" % (corpid, corpsecret)
+        req = requests.get(url)
+        ret = req.json()
+        if 'access_token' in ret:
+            cache_access_token = ret.get('access_token')
+            caches('qywechat_access_token',cache_access_token,timeout=2*60*60 - 60)
+    return cache_access_token
+
+def send_text(content):
+    config = current_app.config.get('CRON_CONFIG')
+    corpid = config.get('qywechat_corpid')
+    corpsecret = config.get('qywechat_corpsecret')
+    agentid = config.get('qywechat_agentid')
+    if not corpid and not corpsecret and not agentid:
+        return
+    access_token = get_access_token(corpid=corpid,corpsecret=corpsecret)
+    url = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=%s" % access_token
+    data = {
+       "touser" : "@all",
+       "toparty" : "@all",
+       "totag" : "@all",
+       "msgtype" : "text",
+       "agentid" : agentid,
+       "text" : {
+           "content" : content
+       },
+       "safe":0,
+       "enable_id_trans": 0,
+       "enable_duplicate_check": 0,
+       "duplicate_check_interval": 1800
+    }
+    req = requests.post(url=url,data=json.dumps(data))
+    print(req.json())
 
 # 单节点任务装饰器，被装饰的任务在分布式多节点下同一时间只能运行一次
 def single_task():

@@ -10,7 +10,6 @@ from app.CuBackgroundScheduler import CuBackgroundScheduler
 from app.CuGeventScheduler import CuGeventScheduler
 from config import config
 
-# scheduler=APScheduler()
 # scheduler = APScheduler(scheduler=CuGeventScheduler())
 scheduler = APScheduler(scheduler=CuBackgroundScheduler())
 

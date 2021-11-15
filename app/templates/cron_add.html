@@ -72,7 +72,7 @@
                 <div class="control-group">
                     <label class="control-label">秒</label>
                     <div class="controls">
-                        <input type="text" name="second" id="title" placeholder="秒">0-59 多个也是用逗号隔开
+                        <input type="text" name="second" id="title" placeholder="秒" {% if is_dev == 1 %} disabled="disabled" {% endif %}>0-59 多个也是用逗号隔开{% if is_dev == 1 %}(<span style="color: red">体验版本,该功能不能用</span>) {% endif %}
                     </div>
                 </div>
                 </div>

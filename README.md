@@ -23,12 +23,20 @@
 
 * Docker 一键安装，方便使用
 
-[体验地址](http://cron_demo.aniulee.com/ "体验地址")
+[体验地址](http://cron_demo.aniulee.com/ "体验地址") 密码：123456
 
 大家有什么问题，或者更好的建议可以加群：[730929995](https://jq.qq.com/?_wv=1027&k=6ovCipI9) 交流交流！
 或者 [问题反馈](https://support.qq.com/products/284784 "问题反馈")
 
 ### 更新记录
+
+#### 2021-11-15
+
+最近有点忙，更新慢。感谢大家的支持！
+
+* 优化上个版本遗留的bug。
+* 新增`企业微信通知`，有错误就会及时通知。
+* 新增回调接口签名，使API更安全。
 
 #### 2021-02-22
 
@@ -72,6 +80,8 @@
 ### 一、基本配置(conf.ini 文件)
 ```ini
 [default]
+#是否是体验环境 1是 0否
+is_dev=0
 #是否单机 0 集群 1单机模式
 is_single=1
 #如果 集群 redis配置必须配置
@@ -90,15 +100,20 @@ cron_db_url=sqlite:////home/www/xiaoniu_cron.sqlite
 cron_job_log_db_url=sqlite:////home/www/xiaoniu_db.sqlite
 #网页登录密码
 login_pwd=12345679
-#推送api_key
-#https://www.aniulee.com/#/notices 实时推送
-error_notice_api_key=
 #异常返回关键词，可自定义,不区分大小写(多个请用，隔开)。当请求req_url之后返回如果包含此关键词，则就会报错通知
 error_keyword=fail
 #每条job记录保存数
 job_log_counts = 1000
 #api调用的时候用到的，假如没设置，代表不验证
 api_access_token = abcdabcd
+#回调接口安全key 
+# 生成规则  
+#参数按 参数按照key=value的格式，并按照参数名ASCII字典序排序拼接后，再拼上api_key，生成xiaoniu_cron_sign
+api_key=thisisapikey
+#企业微信配置信息
+qywechat_corpid=**********
+qywechat_corpsecret=***********
+qywechat_agentid=*************
 ```
 
 ### 二、修改docker-compose.yml 文件

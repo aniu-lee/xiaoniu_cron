@@ -13,6 +13,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_POOL_RECYCLE = 3000
 
     SCHEDULER_API_ENABLED = False
 
@@ -21,7 +22,7 @@ class Config:
     BASEDIR = basedir
 
     SCHEDULER_JOBSTORES = {
-        'default': SQLAlchemyJobStore(url=configs('cron_db_url'))
+        'default': SQLAlchemyJobStore(url=configs('cron_db_url'),engine_options={'pool_recycle':30})
     }
     SCHEDULER_EXECUTORS = {
         'default': {
@@ -67,11 +68,13 @@ class Config:
             'day_of_week': "*",
             'day': '*',
             'hour': '*',
-            'minute': '*/10',
+            'minute': '*',
+            'second':'*/15'
         }
     ]
 
     LOGIN_PWD = configs('login_pwd')
+    CRON_CONFIG = configs()
 
     @staticmethod
     def init_app(app):

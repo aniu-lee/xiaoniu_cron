@@ -11,7 +11,7 @@ import requests
 from flask import current_app
 
 from app import scheduler, db
-from app.common.functions import wechat_info_err, single_task
+from app.common.functions import wechat_info_err, single_task, get_xiaoniu_cron_sign
 from configs import configs
 from datas.model.cron_infos import CronInfos
 from datas.model.job_log import JobLog
@@ -21,7 +21,12 @@ from datas.utils.times import get_now_time
 @single_task()
 def cron_check_db_sleep():
     with scheduler.app.app_context():
-        db.session.execute("select 1 limit 1").first()
+        try:
+            db.session.execute("SELECT 1;")
+            db.session.commit()
+        except Exception as e:
+            wechat_info_err('定时任务发生严重错误', '检查数据库出错:%s' % str(e))
+            db.session.rollback()
 
 '''
 定时操作
@@ -31,6 +36,9 @@ def cron_do(cron_id):
     with scheduler.app.app_context():
 
         try:
+
+            CRON_CONFIG = current_app.config.get('CRON_CONFIG')
+
             nows = get_now_time()
 
             cif = CronInfos.query.get(cron_id)
@@ -53,11 +61,27 @@ def cron_do(cron_id):
                     else:
                         try:
 
+                            api_key = CRON_CONFIG.get('api_key') or ''
+
                             xiaoniu_cron_log_id = str(uuid.uuid1())
+
+                            parmas = {}
 
                             t = time.time()
 
-                            req = requests.get(req_url,params={'xiaoniu_cron_log_id':xiaoniu_cron_log_id},timeout=2*60,headers={'user-agent':'xiaoniu_cron'})
+                            if req_url.find('?') != -1:
+                                pp = req_url.split('?')[-1]
+                                if pp.find('&&') != -1:
+                                    ps = pp.split('&&')
+                                else:
+                                    ps = pp.split('&')
+                                parmas = {d.split('=')[0]: d.split('=')[1] for d in ps}
+
+                            parmas['xiaoniu_cron_log_id'] = xiaoniu_cron_log_id
+
+                            xiaoniu_cron_sign = get_xiaoniu_cron_sign(parmas, api_key=api_key)
+
+                            req = requests.get(req_url,params={'xiaoniu_cron_log_id':xiaoniu_cron_log_id,'xiaoniu_cron_sign':xiaoniu_cron_sign},timeout=2*60,headers={'user-agent':'xiaoniu_cron'})
 
                             ret = req.text
 
@@ -69,7 +93,7 @@ def cron_do(cron_id):
                             if type(ret) == dict:
                                 ret = json.dumps(ret,ensure_ascii=False)
 
-                            error_keyword = configs('error_keyword')
+                            error_keyword = CRON_CONFIG.get('error_keyword')
 
                             if error_keyword:
                                 error_keyword = error_keyword.replace('，', ',').split(',')
@@ -89,6 +113,7 @@ def cron_do(cron_id):
                             wechat_info_err('定时任务【%s】发生严重错误' % cif.task_name, '返回信息:%s' % str(e))
 
         except Exception as e:
+            db.session.rollback()
             trace_info = traceback.format_exc()
             current_app.logger.error("==============")
             current_app.logger.error(str(e))
@@ -124,6 +149,7 @@ def cron_check():
                         db.session.add(item)
                         db.session.commit()
         except Exception as e:
+            db.session.rollback()
             trace_info = traceback.format_exc()
             current_app.logger.error("==============")
             current_app.logger.error(str(e))
@@ -149,6 +175,7 @@ def cron_del_job_log():
                         db.session.execute(sql)
                         db.session.commit()
         except Exception as e:
+            db.session.rollback()
             trace_info = traceback.format_exc()
             current_app.logger.error("==============")
             current_app.logger.error(str(e))

@@ -1,16 +1,20 @@
 #!/usr/bin/python3 
 # -*- coding:utf-8 -*-
-from flask import request
+from flask import request, current_app
 
 from app import scheduler, db
 from app.decorated import api_deal_return, api_err_return
-from configs import configs
 from datas.model.cron_infos import CronInfos
 from datas.model.job_log import JobLog
 from datas.model.job_log_items import JobLogItems
 from . import api
 from ..crons import cron_do
 
+@api.route('/test',methods=['GET','POST'])
+@api_deal_return
+def test():
+    print(request.values.to_dict())
+    return 'test'
 
 '''
 添加（更新）定时
@@ -29,8 +33,11 @@ req_url
 @api.route('/cron',methods=['GET','POST'])
 @api_deal_return
 def crons():
+    CRON_CONFIG = current_app.config.get('CRON_CONFIG')
 
-    api_access_token = configs('api_access_token')
+    is_dev = int(CRON_CONFIG.get('is_dev'))
+
+    api_access_token = CRON_CONFIG.get('api_access_token')
 
     datas = request.values.to_dict()
 
@@ -59,36 +66,238 @@ def crons():
 
     if day:
         if day.isdigit() and int(day) not in range(1, 32):
-            return api_err_return(msg='日（号）不在范围(0~31)内，请检查！')
+            return api_err_return(code=1, msg='日（号）不在范围内，请检查！')
         else:
-            pass
+            '''
+            day 1,2,4-1
+            day 1,2,4
+            day 1-20
+            '''
+            day = day.replace('，', ',')
+            if day.find(',') != -1 and day.find('-') != -1:
+                return api_err_return(code=1, msg='【日】格式有误，同时出现，-')
+
+            if day.find('-') != -1:
+                day_s = day.split('-')
+                if len(day_s) != 2:
+                    return api_err_return(code=1, msg='【日】格式有误哦')
+
+                day_s_1 = day_s[0]
+                day_s_2 = day_s[-1]
+                if day_s_1.isdigit() is False or day_s_2.isdigit() is False:
+                    return api_err_return(code=1, msg='【日】必须是整数')
+
+                if int(day_s_1) >= int(day_s_2):
+                    return api_err_return(code=1, msg='【日】前面不能大于后面')
+
+                if int(day_s_1) not in range(1, 32) or int(day_s_2) not in range(1, 32):
+                    return api_err_return(code=1, msg='【日】不在范围内')
+
+            elif day.find(',') != -1:
+                day_s = day.split(',')
+                for item in day_s:
+                    if item.isdigit() is False:
+                        return api_err_return(code=1, msg='【日】必须是整数')
+                    if int(item) not in range(1, 32):
+                        return api_err_return(code=1, msg='【日】格式有误，数值不在范围内')
+            elif day.find('*') != -1:
+                if day.strip() != '*':
+                    if day.find('*/') == -1:
+                        return api_err_return(code=1, msg='【日】格式有误')
+                    if day.split('/')[-1].isdigit() is False:
+                        return api_err_return(code=1, msg='【日】格式有误')
+            else:
+                return api_err_return(code=1, msg='【日】必须是整数')
 
     day_of_week = datas.get('day_of_week') or ''
-
     if day_of_week:
         if day_of_week.isdigit():
             if int(day_of_week) not in range(0, 7):
-                return api_err_return(msg='星期 不在范围(0~6)内，请检查！')
+                return api_err_return(code=1, msg='【星期】 不在范围内，请检查！')
         else:
-            if day_of_week not in ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']:
-                return api_err_return(msg='星期 不在范围(mon,tue,wed,thu,fri,sat,sun)内，请检查！')
+            # 1,2,4
+            # 1-3
+            day_of_week = day_of_week.replace('，', ',')
+            if day_of_week.find(',') != -1 and day_of_week.find('-') != -1:
+                return api_err_return(code=1, msg='【星期】格式有误，同时出现，-')
 
+            if day_of_week.find('-') != -1:
+                day_s = day_of_week.split('-')
+                if len(day_s) != 2:
+                    return api_err_return(code=1, msg='【星期】格式有误哦')
+
+                day_s_1 = day_s[0]
+                day_s_2 = day_s[-1]
+                if day_s_1.isdigit() is False or day_s_2.isdigit() is False:
+                    return api_err_return(code=1, msg='【星期】必须是整数')
+
+                if int(day_s_1) >= int(day_s_2):
+                    return api_err_return(code=1, msg='【星期】前面不能大于后面')
+
+                if int(day_s_1) not in range(0, 7) or int(day_s_2) not in range(0, 7):
+                    return api_err_return(code=1, msg='【星期】不在范围内')
+
+            elif day_of_week.find(',') != -1:
+                day_s = day_of_week.split(',')
+                for item in day_s:
+                    if item.isdigit() is False:
+                        if item not in ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']:
+                            return api_err_return(code=1, msg='【星期】 不在范围内，请检查！')
+                    else:
+                        if int(item) not in range(0, 7):
+                            return api_err_return(code=1, msg='【星期】格式有误，数值不在范围内')
+
+            elif day_of_week.find('*') != -1:
+                if day_of_week.strip() != '*':
+                    if day_of_week.find('*/') == -1:
+                        return api_err_return(code=1, msg='【星期】格式有误')
+                    if day_of_week.split('/')[-1].isdigit() is False:
+                        return api_err_return(code=1, msg='【星期】格式有误')
+            else:
+                if day_of_week not in ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']:
+                    return api_err_return(code=1, msg='【星期】 不在范围内，请检查！')
+
+    '''
+    0-23
+    '''
     hour = datas.get('hour') or ''
+    if hour:
+        if hour.isdigit():
+            if int(hour) not in range(0, 24):
+                return api_err_return(code=1, msg='【小时】 不在范围内，请检查！')
+        else:
+            # 1,2,4
+            # 1-3
+            hour = hour.replace('，', ',')
+            if hour.find(',') != -1 and hour.find('-') != -1:
+                return api_err_return(code=1, msg='【小时】格式有误，同时出现，-')
 
-    if hour and hour.isdigit():
-        if int(hour) not in range(0, 24):
-            return api_err_return(msg='小时 不在范围(0~23)内，请检查！')
+            if hour.find('-') != -1:
+                day_s = hour.split('-')
+                if len(day_s) != 2:
+                    return api_err_return(code=1, msg='【小时】格式有误哦')
 
+                day_s_1 = day_s[0]
+                day_s_2 = day_s[-1]
+                if day_s_1.isdigit() is False or day_s_2.isdigit() is False:
+                    return api_err_return(code=1, msg='【小时】必须是整数')
+
+                if int(day_s_1) >= int(day_s_2):
+                    return api_err_return(code=1, msg='【小时】前面不能大于后面')
+
+                if int(day_s_1) not in range(0, 24) or int(day_s_2) not in range(0, 24):
+                    return api_err_return(code=1, msg='【小时】不在范围内')
+
+            elif hour.find(',') != -1:
+                day_s = hour.split(',')
+                for item in day_s:
+                    if item.isdigit() is False:
+                        return api_err_return(code=1, msg='【小时】必须是整数！')
+                    else:
+                        if int(item) not in range(0, 7):
+                            return api_err_return(code=1, msg='【小时】格式有误，数值不在范围内')
+
+            elif hour.find('*') != -1:
+                if hour.strip() != '*':
+                    if hour.find('*/') == -1:
+                        return api_err_return(code=1, msg='【小时】格式有误')
+                    if hour.split('/')[-1].isdigit() is False:
+                        return api_err_return(code=1, msg='【小时】格式有误')
+            else:
+                return api_err_return(code=1, msg='【小时】必须是整数')
+
+    '''
+    0-59
+    '''
     minute = datas.get('minute') or ''
-    if minute and minute.isdigit():
-        if int(minute) not in range(0, 60):
-            return api_err_return(msg='分钟 不在范围(0~59)内，请检查！')
+    if minute:
+        if minute.isdigit():
+            if int(minute) not in range(0, 60):
+                return api_err_return(code=1, msg='【分】 不在范围内，请检查！')
+        else:
+            # 1,2,4
+            # 1-3
+            minute = minute.replace('，', ',')
+            if minute.find(',') != -1 and minute.find('-') != -1:
+                return api_err_return(code=1, msg='【分】格式有误，同时出现，-')
+
+            if minute.find('-') != -1:
+                day_s = minute.split('-')
+                if len(day_s) != 2:
+                    return api_err_return(code=1, msg='【分】格式有误哦')
+
+                day_s_1 = day_s[0]
+                day_s_2 = day_s[-1]
+                if day_s_1.isdigit() is False or day_s_2.isdigit() is False:
+                    return api_err_return(code=1, msg='【分】必须是整数')
+
+                if int(day_s_1) >= int(day_s_2):
+                    return api_err_return(code=1, msg='【分】前面不能大于后面')
+
+                if int(day_s_1) not in range(0, 60) or int(day_s_2) not in range(0, 60):
+                    return api_err_return(code=1, msg='【分】不在范围内')
+
+            elif minute.find(',') != -1:
+                day_s = minute.split(',')
+                for item in day_s:
+                    if item.isdigit() is False:
+                        return api_err_return(code=1, msg='【分】必须是整数！')
+                    else:
+                        if int(item) not in range(0, 60):
+                            return api_err_return(code=1, msg='【分】格式有误，数值不在范围内')
+
+            elif minute.find('*') != -1:
+                if minute.strip() != '*':
+                    if minute.find('*/') == -1:
+                        return api_err_return(code=1, msg='【分】格式有误')
+                    if minute.split('/')[-1].isdigit() is False:
+                        return api_err_return(code=1, msg='【分】格式有误')
+            else:
+                return api_err_return(code=1, msg='【分】必须是整数')
 
     second = datas.get('second') or ''
+    if second:
+        if second.isdigit():
+            if int(second) not in range(0, 60):
+                return api_err_return(code=1, msg='【秒】 不在范围内，请检查！')
+        else:
+            second = second.replace('，', ',')
+            if second.find(',') != -1 and second.find('-') != -1:
+                return api_err_return(code=1, msg='【秒】格式有误，同时出现，-')
 
-    if second and second.isdigit():
-        if int(second) not in range(0, 60):
-            return api_err_return(msg='秒 不在范围(0~59)内，请检查！')
+            if second.find('-') != -1:
+                day_s = second.split('-')
+                if len(day_s) != 2:
+                    return api_err_return(code=1, msg='【秒】格式有误哦')
+
+                day_s_1 = day_s[0]
+                day_s_2 = day_s[-1]
+                if day_s_1.isdigit() is False or day_s_2.isdigit() is False:
+                    return api_err_return(code=1, msg='【秒】必须是整数')
+
+                if int(day_s_1) >= int(day_s_2):
+                    return api_err_return(code=1, msg='【秒】前面不能大于后面')
+
+                if int(day_s_1) not in range(0, 60) or int(day_s_2) not in range(0, 60):
+                    return api_err_return(code=1, msg='【秒】不在范围内')
+
+            elif second.find(',') != -1:
+                day_s = second.split(',')
+                for item in day_s:
+                    if item.isdigit() is False:
+                        return api_err_return(code=1, msg='【秒】必须是整数！')
+                    else:
+                        if int(item) not in range(0, 60):
+                            return api_err_return(code=1, msg='【秒】格式有误，数值不在范围内')
+
+            elif second.find('*') != -1:
+                if second.strip() != '*':
+                    if second.find('*/') == -1:
+                        return api_err_return(code=1, msg='【秒】格式有误')
+                    if second.split('/')[-1].isdigit() is False:
+                        return api_err_return(code=1, msg='【秒】格式有误')
+            else:
+                return api_err_return(code=1, msg='【秒】必须是整数')
 
     '''
     判断一下 run_date 必须有个不能为空
@@ -104,6 +313,8 @@ def crons():
 
     if 'http://' not in req_url and 'https://' not in req_url:
         return api_err_return(msg='回调URL格式有错')
+
+    if is_dev == 1:second=''
 
     if not cif:
         cif = CronInfos(task_name=task_name, task_keyword=task_keyword, run_date=run_date, day_of_week=day_of_week,
@@ -159,7 +370,9 @@ status
 def cron_status():
     datas = request.values.to_dict()
 
-    api_access_token = configs('api_access_token')
+    CRON_CONFIG = current_app.config.get('CRON_CONFIG')
+
+    api_access_token = CRON_CONFIG.get('api_access_token')
 
     task_name = datas.get('task_name')
 
@@ -227,7 +440,9 @@ content
 def cron_add_log():
     datas = request.values.to_dict()
 
-    api_access_token = configs('api_access_token')
+    CRON_CONFIG = current_app.config.get('CRON_CONFIG')
+
+    api_access_token = CRON_CONFIG.get('api_access_token')
 
     access_token = datas.get('access_token')
 
@@ -251,9 +466,13 @@ def cron_add_log():
     jl = JobLog.query.filter(JobLog.log_id == xiaoniu_cron_log_id).first()
     if not jl:
         return api_err_return(msg='xiaoniu_cron_log_id 不存在')
+
     jli = JobLogItems(log_id=xiaoniu_cron_log_id,content=content)
+
     db.session.add(jli)
+
     db.session.commit()
+
     return 'ok'
 
 

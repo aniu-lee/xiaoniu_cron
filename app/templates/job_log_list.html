@@ -10,7 +10,7 @@
             <table class="table table-hover table-bordered">
                 <thead>
                 <tr>
-                    <th>编号</th>
+                    <th>log_id</th>
                     <th>返回的内容</th>
                     <th>执行时间</th>
                     <th>耗时</th>
@@ -20,7 +20,7 @@
                 <tbody>
                     {% for item in page_data.items %}
                     <tr>
-                        <td>{{ item.id }}</td>
+                        <td>{{ item.log_id }}</td>
                         <td>{{ item.content }}</td>
                         <td>{{ item.create_time }}</td>
                         <td>{{ item.take_time }}</td>

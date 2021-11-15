@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 import os
+
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell
 
@@ -29,13 +30,7 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def test():
-    # print("Hello world")
-    # d = configs('job_log_counts')
-    # print(d)
-    # print(uuid.uuid1())
-    '''
-    sudo docker exec -it $DOCKER_ID /bin/bash -c 'cd /packages/detectron && python tools/train.py'
-    '''
+    print("Hello world")
     pass
 
 if __name__ == '__main__':

@@ -33,7 +33,7 @@
         </div>
 <div style="text-align: center">
 <form action="{{ url_for('main.check_pass') }}" method="post" class="well form-search form-inline">
-    <input type="text" name="password" value="" placeholder="密码" class="form-control"> <input type="submit" value="确定" class="btn btn-primary">
+    <input type="text" name="password" value="" placeholder="{{ placeholder }}" class="form-control"> <input type="submit" value="确定" class="btn btn-primary">
     <br>当前系统时间: {{ today }}
 </form>
     {% if msg %}
