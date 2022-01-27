@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+    <title>小牛定时任务管理系统</title>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <![endif]-->
+
+    <link href="{{ url_for('static',filename='js/simpleboot/themes/flat/theme.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static',filename='js/simpleboot/css/simplebootadmin.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static',filename='js/artDialog/skins/default.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static',filename='js/simpleboot/font-awesome/4.4.0/css/font-awesome.min.css') }}"
+          rel="stylesheet" type="text/css">
+    <style>
+        form .input-order {
+            margin-bottom: 0px;
+            padding: 3px;
+            width: 40px;
+        }
+
+        .table-actions {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            padding: 0px;
+        }
+
+        .table-list {
+            margin-bottom: 0px;
+        }
+    </style>
+    {% block css %} {% endblock %}
+    <!--[if IE 7]>
+	<link rel="stylesheet" href="{{ url_for('static',filename='js/simpleboot/font-awesome/4.4.0/css/font-awesome-ie7.min.css') }}">
+	<![endif]-->
+    <script type="text/javascript">
+        //全局变量
+        var GV = {
+            ROOT: "/",
+            WEB_ROOT: "",
+            JS_ROOT: "{{ url_for('static',filename='js/') }}",
+            UPLOAD_URL: "/"
+        };
+    </script>
+    <script src="{{ url_for('static',filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/wind.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/simpleboot/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script>
+        $(function () {
+            $("[data-toggle='tooltip']").tooltip();
+        });
+    </script>
+</head>
+<body>
+{% block content %}{% endblock %}
+<script src="{{ url_for('static',filename='js/md5.js') }}"></script>
+<script src="{{ url_for('static',filename='js/signs.js') }}"></script>
+<script src="{{ url_for('static',filename='js/requests.js') }}"></script>
+<script src="{{ url_for('static',filename='js/common.js') }}"></script>
+{% block js %}{% endblock %}
+</body>
+</html>
+

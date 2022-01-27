@@ -1,0 +1,109 @@
+{% extends "admin_base.html" %}
+
+{% block css %}
+{% endblock %}
+{% block content %}
+    <div class="wrap">
+        <div class="jumbotron">
+            <div style="text-align: center">
+                <h1 class="display-4">小牛定时任务管理系统</h1>
+                <p class="lead">&nbsp;&nbsp;方便、统一、自由</p>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs">
+            <li><a href="{{ url_for('main.cron_list') }}">任务列表</a></li>
+            <li class="active"><a href="{{ url_for('main.cron_add') }}">任务添加</a></li>
+        </ul>
+        <form method="post" class="form-horizontal js-ajax-form" action='{{ url_for('main.cron_add') }}'>
+            <fieldset>
+                <div class="control-group">
+                    <label class="control-label">任务名称</label>
+                    <div class="controls">
+                        <input type="text" name="task_name" />* 不可重复
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">任务关键词(备注)</label>
+                    <div class="controls">
+                        <input type="text" name="task_keyword" />可为空
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">定时方式</label>
+                    <div class="controls">
+                        <select name="ds_ms" id="ds_ms">
+                            <option value="1">具体时间</option>
+                            <option value="2">定时模式</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group" id="run_date">
+                    <label class="control-label">具体时间</label>
+                    <div class="controls">
+                        <input type="text" name="run_date" class="js-datetime"/>假如这个有填,下面时间设置不再实现
+                    </div>
+                </div>
+                <div id="cron_div" style="display: none;">
+                <div class="control-group">
+                    <label class="control-label">日(号)</label>
+                    <div class="controls">
+                        <input type="text" name="day" id="title" placeholder="几号">1-31
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">星期几</label>
+                    <div class="controls">
+                        <input type="text" name="day_of_week" id="title" placeholder="星期几">(0-6 or mon,tue,wed,thu,fri,sat,sun) 用逗号隔开,不填表示默认
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">小时</label>
+                    <div class="controls">
+                        <input type="text" name="hour" id="title" placeholder="小时">0-23 多个也是用逗号隔开(<b>例如：每两个小时执行,应填 */2,以下一样的表达</b>)不填表示默认
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">分钟</label>
+                    <div class="controls">
+                        <input type="text" name="minute" id="title" placeholder="分钟">0-59 多个也是用逗号隔开,不填表示默认
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">秒</label>
+                    <div class="controls">
+                        <input type="text" name="second" id="title" placeholder="秒" {% if is_dev == 1 %} disabled="disabled" {% endif %}>0-59 多个也是用逗号隔开{% if is_dev == 1 %}(<span style="color: red">体验版本,该功能不能用</span>) {% endif %}
+                    </div>
+                </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">回调URL以及参数</label>
+                    <div class="controls">
+                        <input type="text" name="req_url">
+                        统一GET请求;当返回内容包含自定义错误关键词里面就会推送错误;配置里面自行配置;系统默认会拼上参数xiaoniu_cron_log_id一起传过去。
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary js-ajax-submit">添加</button>
+                <a class="btn" href="javascript:history.back();">返回</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $('#ds_ms').change(function () {
+            var val = $(this).val();
+            if (val == 1) {
+                $('#run_date').show()
+                $('#cron_div').hide()
+            }else {
+                $('#run_date').hide()
+                $('#cron_div').show()
+            }
+        });
+    </script>
+{% endblock %}

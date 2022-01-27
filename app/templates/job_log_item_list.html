@@ -1,0 +1,26 @@
+{% extends "admin_base.html" %}
+
+{% import "admin_page.html" as pg %}
+{% block content %}
+    <div class="wrap js-check-wrap">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="javascript:;">运行记录</a></li>
+        </ul>
+        <form method="post" class="js-ajax-form" action="">
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th>内容</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for item in page_data %}
+                    <tr>
+                        <td>{{ item.content }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+{% endblock %}

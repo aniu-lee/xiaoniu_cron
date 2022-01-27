@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>小牛定时任务管理系统|所有任务</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+{#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">#}
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <style>
+        .zt{
+            color: orange;
+            font-size: 1.4em;
+        }
+        a:hover{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<h1 style="text-align: center">所有任务列表</h1>
+{% if msg %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <strong>Warning!</strong> {{ msg }}
+    </div>
+{% endif %}
+<form class="well form-search form-inline" method="get" action="{{ url_for('main.index_db') }}">
+            高级查询：
+            <input type="text" name="keyword" value="{{ keyword }}" placeholder="" class="form-control">
+            <input type="submit" class="btn btn-primary" value="搜索"/>
+            <a href="{{ url_for('main.index_db') }}" class="btn btn-danger">重置</a> <a href="{{ url_for('main.logout') }}" class="btn btn-danger">退出登录</a> <a href="{{ url_for('main.index_log') }}">执行任务记录列表</a>
+</form>
+总条数:{{ datas | length }}
+<table class="table table-hover table-bordered table-responsive">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>下次执行时间</th>
+                    <th width="120">操作事项</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in datas %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.next_run_time }}</td>
+                        <td>
+                            <a href="{{ url_for('main.delete_join',job_id=item['id']) }}">删除</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+</body>
+</html>
