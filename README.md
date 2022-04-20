@@ -30,6 +30,13 @@
 
 ### 更新记录
 
+#### 2022-04-20
+
+小修复
+
+* fix 定时任务 小时（9,14,16）没判断好！
+
+
 #### 2022-01-27
 
 提前祝大家新年快乐！
@@ -139,8 +146,6 @@ https://www.aniulee.com/#/details?id=286
 
 。。。
 
-[更多例子设置参考](https://www.aniulee.com/#/details?id=260 "更多例子")
-
 ### 六、问题反馈
 
 [问题反馈](https://support.qq.com/products/284784 "问题反馈")
@@ -153,10 +158,18 @@ QQ群：[730929995](https://jq.qq.com/?_wv=1027&k=6ovCipI9)
 
 [小牛异步队列任务系统](https://github.com/aniu-lee/xiaoniu_tasks "小牛异步队列任务系统")
 
-[两分钟内实现实时推送](https://www.aniulee.com/#/wx_push_setting "两分钟内实现实时推送")
+[小牛简易socketio推送服务](https://github.com/aniu-lee/xiaoniu_socketio_server "小牛简易socketio推送服务")
 
 
 #### 如果感觉项目还不错，有帮到您，来颗星，感谢！
 
 #### 开源不易，欢迎大佬赏杯茶。
-[![6](doc/6.png "添加date定时")]()
+
+
+微信扫一扫
+
+[![微信扫一扫](doc/weixin.jpg "微信扫码打赏")]()
+
+支付宝扫一扫
+
+[![支付宝扫一扫](doc/ali.jpg "微信扫码打赏")]()

@@ -262,7 +262,7 @@ def cron_add():
                             if item.isdigit() is False:
                                 return web_api_return(code=1, msg='【小时】必须是整数！')
                             else:
-                                if int(item) not in range(0, 7):
+                                if int(item) not in range(0, 24):
                                     return web_api_return(code=1, msg='【小时】格式有误，数值不在范围内')
 
                     elif hour.find('*') != -1:
@@ -585,7 +585,7 @@ def cron_edit():
                         if item.isdigit() is False:
                             return web_api_return(code=1, msg='【小时】必须是整数！')
                         else:
-                            if int(item) not in range(0, 7):
+                            if int(item) not in range(0, 24):
                                 return web_api_return(code=1, msg='【小时】格式有误，数值不在范围内')
 
                 elif hour.find('*') != -1:
