@@ -807,7 +807,6 @@ def cron_batch_del():
 
 @main.route('/check_pass', methods=['GET', 'POST'])
 def check_pass():
-    today = get_now_time()
     msg = request.values.get('msg', '')
     CRON_CONFIG = current_app.config.get('CRON_CONFIG')
     is_dev = int(CRON_CONFIG.get('is_dev'))
@@ -829,7 +828,7 @@ def check_pass():
             return redirect('/cron_list')
         except:
             return redirect("/check_pass?msg=系统有误,请重新试试")
-    return render_template("check_pass.html", msg=msg, today=today,placeholder=placeholder)
+    return render_template("check_pass.html", msg=msg,placeholder=placeholder)
 
 @main.route('/logout')
 def logout():
