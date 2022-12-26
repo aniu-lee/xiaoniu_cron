@@ -7,6 +7,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell
 
 from app import create_app, db
+from app.common.functions import dd_push
 from datas.model.cron_infos import CronInfos
 
 from datas.model.job_log import JobLog
@@ -31,8 +32,6 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def test():
-    print("Hello world")
-    print("{{content}} aaa".replace("{{content}}","bbb"))
     pass
 
 if __name__ == '__main__':

@@ -19,7 +19,7 @@
 
 * 支持查看日志
 
-* BUG及时通知,支持webhook,企业微信
+* BUG及时通知,支持webhook,企业微信,钉钉通知等
 
 * Docker 一键安装，方便使用
 
@@ -29,6 +29,16 @@
 或者 [问题反馈](https://support.qq.com/products/284784 "问题反馈")
 
 ### 更新记录
+
+#### 2022-12-26
+
+疫情真的很难顶，现在全部放开了，大家自觉做好防护！
+
+* 增加 钉钉通知
+* 增加 windows支持运行
+* 增加 windows 部署文档(很多用户是用windows做测试的) [部署文档地址](https://github.com/aniu-lee/xiaoniu_cron/tree/master/doc/windows部署文档.md "文档")
+* fix 编辑任务一个小问题
+
 
 #### 2022-06-01
 

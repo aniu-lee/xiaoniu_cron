@@ -1,9 +1,12 @@
 #!/usr/bin/python3 
 # -*- coding:utf-8 -*-
+import base64
 import hashlib
+import hmac
 import json
 import os
 import time
+import urllib
 from functools import wraps
 
 import redis
@@ -143,9 +146,46 @@ def web_hook_push(content):
     except Exception as e:
         current_app.logger.error("web_hook请求有误:%s" % str(e))
 
+def dd_push(content):
+    try:
+
+        config = current_app.config.get('CRON_CONFIG')
+
+        webhook = config.get('dingding_webhook')
+
+        secret = config.get('dingding_secret')
+
+        if not webhook and not secret:
+            current_app.logger.error(f'钉钉通知提醒未设置')
+            return
+
+        # 每个机器人每分钟最多发送20条消息到群里，如果超过20条，会限流10分钟。
+        # 文档：https://open.dingtalk.com/document/robots/custom-robot-access
+        timestamp = str(round(time.time() * 1000))
+        secret_enc = secret.encode('utf-8')
+        string_to_sign = '{}\n{}'.format(timestamp, secret)
+        string_to_sign_enc = string_to_sign.encode('utf-8')
+        hmac_code = hmac.new(secret_enc, string_to_sign_enc, digestmod=hashlib.sha256).digest()
+        sign = urllib.parse.quote_plus(base64.b64encode(hmac_code))
+        url = "%s&timestamp=%s&sign=%s" % (webhook,timestamp,sign)
+        data = {
+            "msgtype": "text",
+            "text": {
+                "content":content
+            }
+        }
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        req = requests.post(url=url, data=json.dumps(data), headers=headers)
+        print(req.json())
+    except Exception as e:
+        current_app.logger.exception(f"钉钉发送通知报错了:{str(e)}")
+
 def send_text(content):
     qyweixin_push(content=content)
     web_hook_push(content=content)
+    dd_push(content=content)
 
 # 单节点任务装饰器，被装饰的任务在分布式多节点下同一时间只能运行一次
 def single_task():

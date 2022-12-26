@@ -37,6 +37,8 @@ def cron_do(cron_id):
 
         try:
 
+            print('11111111111')
+
             CRON_CONFIG = current_app.config.get('CRON_CONFIG')
 
             nows = get_now_time()
@@ -113,6 +115,8 @@ def cron_do(cron_id):
                             wechat_info_err('定时任务【%s】发生严重错误' % cif.task_name, '返回信息:%s' % str(e))
 
         except Exception as e:
+            print('118--------------')
+            print(str(e))
             db.session.rollback()
             trace_info = traceback.format_exc()
             current_app.logger.error("==============")

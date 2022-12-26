@@ -1,20 +1,24 @@
 import logging
+import platform
 from logging.handlers import TimedRotatingFileHandler
 
-from apscheduler.schedulers.gevent import GeventScheduler
 from flask import Flask
 from flask_apscheduler import APScheduler
 from flask_sqlalchemy import SQLAlchemy
 
-from app.CuBackgroundScheduler import CuBackgroundScheduler
-from app.CuGeventScheduler import CuGeventScheduler
 from config import config
 
-# scheduler = APScheduler(scheduler=CuGeventScheduler())
+sys = platform.system()
+
+from app.CuBackgroundScheduler import CuBackgroundScheduler
+
 scheduler = APScheduler(scheduler=CuBackgroundScheduler())
+
+# scheduler = APScheduler()
 
 db = SQLAlchemy()
 
+isCreate = False
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -41,8 +45,9 @@ def create_app(config_name):
     app.logger.addHandler(error_handler)
     error_handler.setFormatter(formatter)
 
-    scheduler.app = app
+
     db.init_app(app)
+    scheduler.app = app
     scheduler.init_app(app)
     scheduler.start()
 

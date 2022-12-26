@@ -24,6 +24,8 @@ def configs(key = None):
     qywechat_corpsecret = cp.get('default','qywechat_corpsecret')
     qywechat_agentid = cp.get('default','qywechat_agentid')
     error_web_hook = cp.get('default','error_web_hook')
+    dingding_webhook = cp.get('default','dingding_webhook')
+    dingding_secret = cp.get('default','dingding_secret')
 
     pz = {
         'qywechat_corpid':qywechat_corpid,
@@ -42,7 +44,9 @@ def configs(key = None):
         'job_log_counts':job_log_counts,
         'api_access_token':api_access_token,
         'error_keyword':error_keyword,
-        'error_web_hook':error_web_hook
+        'error_web_hook':error_web_hook,
+        'dingding_webhook':dingding_webhook,
+        'dingding_secret':dingding_secret
     }
 
     return pz

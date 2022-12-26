@@ -1,10 +1,10 @@
 #!/usr/bin/python3 
 # -*- coding:utf-8 -*-
-import fcntl
 import os
 from datetime import datetime, timedelta
 from threading import TIMEOUT_MAX
 
+import portalocker
 import records
 import six
 from apscheduler.events import JobSubmissionEvent, EVENT_JOB_MAX_INSTANCES, EVENT_JOB_SUBMITTED
@@ -43,7 +43,7 @@ class CuBackgroundScheduler(BackgroundScheduler):
         f = open("scheduler.lock", "wb")
         wait_seconds = None
         try:
-            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            portalocker.lock(f, portalocker.LOCK_EX | portalocker.LOCK_NB)
         except Exception as exc:
             f.close()
         else:
@@ -138,7 +138,7 @@ class CuBackgroundScheduler(BackgroundScheduler):
                 self._logger.debug('Next wakeup is due at %s (in %f seconds)', next_wakeup_time,
                                    wait_seconds)
 
-            fcntl.flock(f, fcntl.LOCK_UN)
+            portalocker.unlock(f)
             f.close()
 
         return wait_seconds
