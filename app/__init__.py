@@ -1,5 +1,4 @@
 import logging
-import platform
 from logging.handlers import TimedRotatingFileHandler
 
 from flask import Flask
@@ -8,13 +7,9 @@ from flask_sqlalchemy import SQLAlchemy
 
 from config import config
 
-sys = platform.system()
-
 from app.CuBackgroundScheduler import CuBackgroundScheduler
 
 scheduler = APScheduler(scheduler=CuBackgroundScheduler())
-
-# scheduler = APScheduler()
 
 db = SQLAlchemy()
 
